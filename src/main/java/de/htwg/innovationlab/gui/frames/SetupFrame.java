@@ -29,6 +29,7 @@ public class SetupFrame extends JFrame implements BridgeListener {
 	private PreferencesFrame preferencesFrame;
 	private JButton findBridges = new JButton();
 	private JButton connectBridge = new JButton();
+	private JButton cancel = new JButton();
 	private List<PHAccessPoint> accessPointsList;
 	private JList<String> accessPointsJList;
 	private DefaultListModel<String> dataModel;
@@ -47,17 +48,20 @@ public class SetupFrame extends JFrame implements BridgeListener {
 		Dimension screenDim = getToolkit().getScreenSize();
 		setLocation(screenDim.width / 5, screenDim.height / 5);
 		setSize((int) (screenDim.width / 5), (int) (screenDim.height / 3));
+		setIconImage(smartBulb.getIcon().getImage());
 
 		initGui();
 		setButtonActions();
 		setListListener();
 		connectBridge.setEnabled(false);
+		cancel.setVisible(false);
+		progressBar.setVisible(false);
 	}
 
 	private void initGui() {
-		setLayout(new BorderLayout(10, 2));
+		setLayout(new BorderLayout(5, 5));
 
-		Dimension preferredSize = new Dimension(150, 35);
+		Dimension preferredSize = new Dimension(200, 35);
 
 		JPanel findBridgesPanel = new JPanel();
 		findBridgesPanel.add(findBridges);
@@ -65,17 +69,19 @@ public class SetupFrame extends JFrame implements BridgeListener {
 		add(findBridgesPanel, BorderLayout.NORTH);
 
 		JPanel lowerPanel = new JPanel();
-		lowerPanel.setLayout(new GridLayout(2, 1));
+		lowerPanel.setLayout(new GridLayout(3, 1));
+		add(lowerPanel, BorderLayout.SOUTH);
+		
+		progressBar = new JProgressBar();
+		progressBar.setBorderPainted(false);
+		lowerPanel.add(progressBar);
 
 		JPanel connectPanel = new JPanel();
 		connectPanel.add(connectBridge);
 		connectPanel.setPreferredSize(preferredSize);
 		lowerPanel.add(connectPanel);
-		add(lowerPanel, BorderLayout.SOUTH);
 
-		progressBar = new JProgressBar();
-		progressBar.setBorderPainted(false);
-		lowerPanel.add(progressBar);
+		lowerPanel.add(cancel);
 
 		dataModel = new DefaultListModel<String>();
 		accessPointsJList = new JList<>(dataModel);
@@ -104,6 +110,16 @@ public class SetupFrame extends JFrame implements BridgeListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				smartBulb.getBridge().connectToBridge(selectedAccessPoint);
+			}
+		});
+		
+		cancel.setAction(new AbstractAction("Cancel") {
+			private static final long serialVersionUID = 1L;
+
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				terminate();
 			}
 		});
 	}
@@ -150,7 +166,9 @@ public class SetupFrame extends JFrame implements BridgeListener {
 	@Override
 	public void accessPointsFound(List<PHAccessPoint> accessPointsList) {
 		setAccessPointList(accessPointsList);
+		cancel.setVisible(false);
 		progressBar.setIndeterminate(false);
+		progressBar.setVisible(false);
 	}
 
 	@Override
@@ -164,11 +182,13 @@ public class SetupFrame extends JFrame implements BridgeListener {
 	@Override
 	public void searchAccessPoints() {
 		progressBar.setIndeterminate(true);
+		progressBar.setVisible(true);
+		cancel.setVisible(true);
 	}
 
 	@Override
 	public void authenticate() {
-		authenticationFrame = new AuthenticationFrame();
+		authenticationFrame = new AuthenticationFrame(smartBulb);
 		authenticationFrame.setVisible(true);
 		authenticationFrame.setAlwaysOnTop(true);
 	}

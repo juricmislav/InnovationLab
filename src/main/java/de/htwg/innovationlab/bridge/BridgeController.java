@@ -19,12 +19,14 @@ public class BridgeController {
 	private PHBridgeSearchManager sm;
 	private ConnectionProperties connectionProperties;
 	private List<BridgeListener> bridgeListeners;
+	private PHBridge bridge;
 
 	public BridgeController(SmartBulb smartBulb) {
 		this.smartBulb = smartBulb;
 		pHHueSDK = PHHueSDK.getInstance();
 		pHHueSDK.getNotificationManager().registerSDKListener(phsdkListener);
 		connectionProperties = new ConnectionProperties();
+		
 	}
 
 	public void terminateInstance() {
@@ -73,9 +75,7 @@ public class BridgeController {
 	}
 
 	public boolean propertiesDefined() {
-		if (connectionProperties.getIpAdress() == null || connectionProperties.getUserName() == null)
-			return false;
-		return true;
+		return !(connectionProperties.getIpAdress() == null || connectionProperties.getUserName() == null);
 	}
 
 	public void connectToBridge(PHAccessPoint accessPoint) {
@@ -115,6 +115,7 @@ public class BridgeController {
 					listener.bridgeConnected();
 				}
 			}
+			BridgeController.this.bridge = bridge;
 		}
 
 		@Override

@@ -38,6 +38,7 @@ public class PreferencesFrame extends JFrame implements BridgeListener {
 		Dimension screenDim = getToolkit().getScreenSize();
 		setLocation(screenDim.width / 6, screenDim.height / 6);
 		setSize((int) (screenDim.width / 4.5), (int) (screenDim.height / 3));
+		setIconImage(smartBulb.getIcon().getImage());
 
 		smartBulb.getBridge().addBridgeListener(this);
 		setButtonActions();
@@ -70,15 +71,13 @@ public class PreferencesFrame extends JFrame implements BridgeListener {
 
 	private void initStatusPanel() {
 		JPanel statusPanel = new JPanel();
-		statusPanel.setBorder(BorderFactory.createLoweredSoftBevelBorder());
+		statusPanel.setBorder(BorderFactory.createEmptyBorder());
 		JTextField statusText = new JTextField("Status:");
 		status = new JTextField();
 		statusText.setEditable(false);
 		status.setEditable(false);
 		statusText.setBorder(null);
 		status.setBorder(null);
-		statusText.setFont(statusText.getFont().deriveFont(Font.BOLD, 14));
-		status.setFont(status.getFont().deriveFont(Font.BOLD, 14));
 		statusPanel.setLayout(new BorderLayout(10, 10));
 		statusPanel.add(statusText, BorderLayout.WEST);
 		statusPanel.add(status, BorderLayout.CENTER);

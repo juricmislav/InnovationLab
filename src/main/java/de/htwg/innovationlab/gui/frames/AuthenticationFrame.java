@@ -10,16 +10,21 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import de.htwg.innovationlab.gui.SmartBulb;
+
 public class AuthenticationFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 
-	public AuthenticationFrame() {
+	private final String imagePath = "resources/pushlink_image.png";
+	
+	public AuthenticationFrame(SmartBulb smartBulb) {
 		setTitle("Authentication");
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setLocationRelativeTo(null);
 		Dimension screenDim = getToolkit().getScreenSize();
 		setLocation(screenDim.width / 4, screenDim.height / 4);
+		setIconImage(smartBulb.getIcon().getImage());
 		
 		Image image = getImage();
 		setSize(image.getWidth(this), image.getHeight(this));
@@ -40,7 +45,7 @@ public class AuthenticationFrame extends JFrame {
 	private Image getImage() {
 		Image image = null;
 		try {
-			image = ImageIO.read(Paths.get("resources/pushlink_image.png").toFile());
+			image = ImageIO.read(Paths.get(imagePath).toFile());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
