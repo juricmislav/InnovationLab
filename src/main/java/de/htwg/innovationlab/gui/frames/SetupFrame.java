@@ -98,8 +98,8 @@ public class SetupFrame extends JFrame implements BridgeListener {
 			public void actionPerformed(ActionEvent e) {
 				connectBridge.setEnabled(false);
 				selectedAccessPoint = null;
-				smartBulb.getBridge().addBridgeListener(SetupFrame.this);
-				smartBulb.getBridge().findAccessPoints();
+				smartBulb.getBridgeController().addBridgeListener(SetupFrame.this);
+				smartBulb.getBridgeController().findAccessPoints();
 			}
 		});
 
@@ -109,7 +109,7 @@ public class SetupFrame extends JFrame implements BridgeListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				smartBulb.getBridge().connectToBridge(selectedAccessPoint);
+				smartBulb.getBridgeController().connectToBridge(selectedAccessPoint);
 			}
 		});
 		
@@ -159,7 +159,7 @@ public class SetupFrame extends JFrame implements BridgeListener {
 	public void dispose() {
 		preferencesFrame.refreshStatus();
 		preferencesFrame.setEnabled(true);
-		smartBulb.getBridge().removeBridgeListener(SetupFrame.this);
+		smartBulb.getBridgeController().removeBridgeListener(SetupFrame.this);
 		super.dispose();
 	}
 

@@ -3,7 +3,6 @@ package de.htwg.innovationlab.gui.frames;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.util.List;
@@ -40,7 +39,7 @@ public class PreferencesFrame extends JFrame implements BridgeListener {
 		setSize((int) (screenDim.width / 4.5), (int) (screenDim.height / 3));
 		setIconImage(smartBulb.getIcon().getImage());
 
-		smartBulb.getBridge().addBridgeListener(this);
+		smartBulb.getBridgeController().addBridgeListener(this);
 		setButtonActions();
 		initGUI();
 	}
@@ -96,7 +95,7 @@ public class PreferencesFrame extends JFrame implements BridgeListener {
 		} else {
 			status.setForeground(Color.RED);
 			status.setText("Not Connected");
-			autoConnect.setEnabled(smartBulb.getBridge().propertiesDefined());
+			autoConnect.setEnabled(smartBulb.getBridgeController().propertiesDefined());
 			disconnect.setEnabled(false);
 			setup.setEnabled(true);
 		}
@@ -109,7 +108,9 @@ public class PreferencesFrame extends JFrame implements BridgeListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				smartBulb.getBridge().autoConnectToBridge();
+				if (smartBulb.getBridgeController().autoConnectToBridge()) {
+					refreshStatus();
+				};
 			}
 		});
 		
@@ -119,7 +120,7 @@ public class PreferencesFrame extends JFrame implements BridgeListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				smartBulb.disconnectBridge();
-				smartBulb.getBridge().addBridgeListener(PreferencesFrame.this);
+				smartBulb.getBridgeController().addBridgeListener(PreferencesFrame.this);
 			}
 		});
 		

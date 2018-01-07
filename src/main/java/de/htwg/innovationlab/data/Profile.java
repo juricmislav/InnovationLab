@@ -1,17 +1,16 @@
 package de.htwg.innovationlab.data;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import de.htwg.innovationlab.gui.rooms.Room;
+import de.htwg.innovationlab.gui.room.Room;
 
 public class Profile {
 
 	private String name;
 	private ProfileType profileType;
-	private Map<String, Room> rooms;
+	private List<Room> rooms;
+	private boolean autoAdjustment;
 	
 	public Profile(String name, ProfileType profileType) {
 		if (name == null || profileType == null) {
@@ -19,11 +18,7 @@ public class Profile {
 		}
 		this.name = name;
 		this.profileType = profileType;
-		rooms = new HashMap<>();
-	}
-	
-	public Room getRoom(String name) {
-		return rooms.get(name);
+		rooms = new ArrayList<>();
 	}
 	
 	public boolean hasRooms() {
@@ -31,11 +26,45 @@ public class Profile {
 	}
 	
 	public List<Room> getRooms() {
-		return new ArrayList<>(rooms.values());
+		return rooms;
 	}
 	
 	public void addRoom(Room room) {
-		rooms.put(room.getName(), room);
+		rooms.add(room);
 	}
 	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public void setProfileType(ProfileType profileType) {
+		this.profileType = profileType;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public void removeRoom(Room room) {
+		rooms.remove(room);
+	}
+	
+	public ProfileType getProfileType() {
+		return profileType;
+	}
+	
+	public boolean containtsRoom(String name) {
+		for (Room room : rooms) {
+			if (room.getName().equals(name)) return true;
+		}
+		return false;
+	}
+	
+	public boolean isAutoAdjustment() {
+		return autoAdjustment;
+	}
+	
+	public void setAutoAdjustment(boolean autoAdjustment) {
+		this.autoAdjustment = autoAdjustment;
+	}
 }
