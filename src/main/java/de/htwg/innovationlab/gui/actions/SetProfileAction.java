@@ -60,7 +60,7 @@ public class SetProfileAction extends RootAction {
 			return;
 		}
 		
-		if (result == JOptionPane.OK_OPTION) {
+		if (result == JOptionPane.OK_OPTION && !nameText.equals("")) {
 			if (smartBulb.getProfile() == null) {
 				smartBulb.setProfile(new Profile(nameText, profileTypes.get(comboBox.getSelectedIndex())));		
 			} else {

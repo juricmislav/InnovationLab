@@ -2,6 +2,7 @@ package de.htwg.innovationlab.gui.bulb;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.BorderFactory;
@@ -30,22 +31,27 @@ public class Bulb extends JPanel {
 	private PHLight light;
 	private Room room;
 	private SmartBulb smartBulb;
-	private JTextField currentColor = new JTextField(8);
+	private JTextField displayColor = new JTextField(8);
 	private JToggleButton switchButton = new JToggleButton();
 	private JRadioButton autoAdjustmentCheckBox = new JRadioButton("Auto Adjustment");
 	private JButton instantAutoAdjustment;
-	private static final float MAX_HUE = 65535;
-	private static final float MAX_SATURATION = 255;
-	private static final float MAX_BRIGTHNESS = 255;
+	private int hue;
+	private int saturation;
+	private int brightness;
+	public static final float MAX_HUE = 65534;
+	public static final float MAX_SATURATION = 254;
+	public static final float MAX_BRIGTHNESS = 254;
 
 	public Bulb(PHLight light, Room room, SmartBulb smartBulb) {
 		this.light = light;
 		this.room = room;
 		this.smartBulb = smartBulb;
-		setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
+		this.hue = light.getLastKnownLightState().getHue();
+		this.saturation = light.getLastKnownLightState().getSaturation();
+		this.brightness = light.getLastKnownLightState().getBrightness();
 
 		initGui();
-		setColor(light.getLastKnownLightState().getHue(), light.getLastKnownLightState().getSaturation(),
+		setdisplayColorHSBtoRGB(light.getLastKnownLightState().getHue(), light.getLastKnownLightState().getSaturation(),
 				light.getLastKnownLightState().getBrightness());
 		switchButton.setSelected(light.getLastKnownLightState().isOn());
 	}
@@ -54,9 +60,12 @@ public class Bulb extends JPanel {
 		this.light = light;
 		this.room = room;
 		this.smartBulb = smartBulb;
+		this.hue = hue;
+		this.saturation = saturation;
+		this.brightness = brightness;
 
 		initGui();
-		setColor(hue, saturation, brightness);
+		setdisplayColorHSBtoRGB(hue, saturation, brightness);
 		switchButton.setSelected(state);
 		PHLightState lightState = new PHLightState();
 		lightState.setOn(state);
@@ -67,35 +76,43 @@ public class Bulb extends JPanel {
 		autoAdjustmentCheckBox.setSelected(autoAdjustment);
 	}
 
-	public void setColor(int hue, int saturation, int brightness) {
-		currentColor.setBackground(
+	public void setdisplayColorHSBtoRGB(int hue, int saturation, int brightness) {
+		displayColor.setBackground(
 				Color.getHSBColor(hue / MAX_HUE, saturation / MAX_SATURATION, brightness / MAX_BRIGTHNESS));
 	}
 
 	private void initGui() {
 		setLayout(new BorderLayout());
+		setBorder(new SoftBevelBorder(SoftBevelBorder.RAISED));
+		Dimension preferredSize = new Dimension(150, 30);
 
 		JButton changeColor = new JButton("Change Bulb Colour");
-		changeColor.setAction(new SetColorAction(smartBulb, "Set Bulb Color", light, currentColor));
+		changeColor.setPreferredSize(preferredSize);
+		changeColor.setAction(new SetColorAction(smartBulb, "Set Bulb Color", this));
 
 		JButton changeBrightness = new JButton("Change Bulb Brightness");
-		changeBrightness.setAction(new SetBrightnessAction(smartBulb, "Set Bulb Brightness", light));
+		changeBrightness.setPreferredSize(preferredSize);
+		changeBrightness.setAction(new SetBrightnessAction(smartBulb, "Set Bulb Brightness", this));
 
 		JButton removeBulb = new JButton("Remove Bulb");
+		removeBulb.setPreferredSize(preferredSize);
 		removeBulb.setAction(new RemoveBulbAction(smartBulb, "Remove Bulb", room, this));
 
 		switchButton.setAction(new SwitchBulbAction(smartBulb, "On / Off", light));
+		switchButton.setPreferredSize(preferredSize);
 
 		instantAutoAdjustment = new JButton();
-		instantAutoAdjustment.setAction(new AutoAdjustmentAction(smartBulb, "Instant Auto Adjustmenet", this));
+		instantAutoAdjustment.setPreferredSize(preferredSize);
+		instantAutoAdjustment.setAction(new AutoAdjustmentAction(smartBulb, "Adjust now", this));
 
-		currentColor.setEnabled(false);
+		displayColor.setEnabled(false);
+		displayColor.setPreferredSize(preferredSize);
 
 		Border bulbPanelBorder = BorderFactory.createTitledBorder("Lightbulb: " + light.getIdentifier());
 		JPanel westPanel = new JPanel();
 		westPanel.setLayout(new BorderLayout());
 		westPanel.setBorder(bulbPanelBorder);
-		westPanel.add(currentColor, BorderLayout.NORTH);
+		westPanel.add(displayColor, BorderLayout.NORTH);
 
 		JPanel changeColorPanel = new JPanel();
 		changeColorPanel.add(changeColor);
@@ -145,8 +162,41 @@ public class Bulb extends JPanel {
 	}
 	
 	public void performAutoAdjustment() {
-		ActionEvent e = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null);
-		autoAdjustmentCheckBox.getAction().actionPerformed(e);
+		new AutoAdjustmentAction(smartBulb, "Auto Adjustment", this).actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+	}
+
+	public int getHue() {
+		return hue;
+	}
+
+	public void setHue(int hue) {
+		this.hue = hue;
+	}
+
+	public int getSaturation() {
+		return saturation;
+	}
+
+	public void setSaturation(int saturation) {
+		this.saturation = saturation;
+	}
+
+	public int getBrightness() {
+		return brightness;
+	}
+	
+	public void setHSB(int hue, int saturation, int brightness) {
+		this.hue = hue;
+		this.saturation = saturation;
+		this.brightness = brightness;
+	}
+
+	public void setBrightness(int brightness) {
+		this.brightness = brightness;
+	}
+	
+	public JTextField getCurrentColor() {
+		return displayColor;
 	}
 	
 }

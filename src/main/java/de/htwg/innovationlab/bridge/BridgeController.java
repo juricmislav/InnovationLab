@@ -96,7 +96,6 @@ public class BridgeController {
 	}
 
 	public List<PHLight> getAllLights() {
-		bridge.
 		if (bridge == null)
 			return null;
 		return bridge.getResourceCache().getAllLights();
@@ -122,6 +121,7 @@ public class BridgeController {
 	}
 
 	public void updateLightState(String idn, PHLightState lightState) {
+		if (idn == null || lightState == null) return;
 		bridge.updateLightState(idn, lightState, null);
 	}
 

@@ -15,9 +15,10 @@ public class AddRoomTab extends JPanel {
 	public AddRoomTab(SmartBulb smartBulb) {
 		setLayout(new BorderLayout());
 		JPanel buttonPanel = new JPanel();
-		JButton button = new JButton();
-		buttonPanel.add(button);
+		JButton createRoom = new JButton();
+		createRoom.setPreferredSize(SmartBulb.preferredSize);
+		buttonPanel.add(createRoom);
 		add(buttonPanel, BorderLayout.WEST);
-		button.setAction(new CreateRoomAction(smartBulb, "Create Room"));
+		createRoom.setAction(new CreateRoomAction(smartBulb, "Create Room"));
 	}
 }

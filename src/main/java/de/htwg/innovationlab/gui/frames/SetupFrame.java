@@ -61,11 +61,9 @@ public class SetupFrame extends JFrame implements BridgeListener {
 	private void initGui() {
 		setLayout(new BorderLayout(5, 5));
 
-		Dimension preferredSize = new Dimension(200, 35);
-
 		JPanel findBridgesPanel = new JPanel();
 		findBridgesPanel.add(findBridges);
-		findBridgesPanel.setPreferredSize(preferredSize);
+		findBridges.setPreferredSize(SmartBulb.preferredSize);
 		add(findBridgesPanel, BorderLayout.NORTH);
 
 		JPanel lowerPanel = new JPanel();
@@ -78,7 +76,7 @@ public class SetupFrame extends JFrame implements BridgeListener {
 
 		JPanel connectPanel = new JPanel();
 		connectPanel.add(connectBridge);
-		connectPanel.setPreferredSize(preferredSize);
+		connectBridge.setPreferredSize(SmartBulb.preferredSize);
 		lowerPanel.add(connectPanel);
 
 		lowerPanel.add(cancel);

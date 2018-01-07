@@ -8,18 +8,18 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 
-import com.philips.lighting.model.PHLight;
 import com.philips.lighting.model.PHLightState;
 
 import de.htwg.innovationlab.gui.SmartBulb;
+import de.htwg.innovationlab.gui.bulb.Bulb;
 
 public class SetBrightnessAction extends RootAction {
 	private static final long serialVersionUID = 1L;
-	private PHLight light;
+	private Bulb bulb;
 
-	public SetBrightnessAction(SmartBulb smartBulb, String name, PHLight light) {
+	public SetBrightnessAction(SmartBulb smartBulb, String name, Bulb bulb) {
 		super(smartBulb, name);
-		this.light = light;
+		this.bulb = bulb;
 	}
 
 	@Override
@@ -29,8 +29,9 @@ public class SetBrightnessAction extends RootAction {
 		dialogPanel.add(new JLabel("Brightness:"));
 		
 		JSlider slider = new JSlider();
+		slider.setMinimum(0);
 		slider.setMaximum(254);
-		slider.setValue(light.getLastKnownLightState().getBrightness());
+		slider.setValue(bulb.getBrightness());
 		dialogPanel.add(slider);
 
 		int result = JOptionPane.showConfirmDialog(smartBulb, dialogPanel, "Set Bulb Brightness", 
@@ -39,8 +40,8 @@ public class SetBrightnessAction extends RootAction {
 		if (result == JOptionPane.OK_OPTION) {
 			PHLightState lightState = new PHLightState();
 			lightState.setBrightness(slider.getValue());
-			smartBulb.getBridgeController().updateLightState(light.getIdentifier(), lightState);
+			smartBulb.getBridgeController().updateLightState(bulb.getLight().getIdentifier(), lightState);
+			bulb.setBrightness(slider.getValue());
 		}
 	}
-
 }

@@ -42,12 +42,15 @@ public class Room extends JPanel {
 		setLayout(new BorderLayout());
 
 		JButton addBulb = new JButton();
+		addBulb.setPreferredSize(SmartBulb.preferredSize);
 		addBulb.setAction(new AddLightBulbAction(smartBulb, "Add LightBulb"));
 		
 		JButton editRoom = new JButton();
+		editRoom.setPreferredSize(SmartBulb.preferredSize);
 		editRoom.setAction(new EditRoomAction(smartBulb, "Edit Room", this));
 		
 		JButton removeRoom = new JButton();
+		removeRoom.setPreferredSize(SmartBulb.preferredSize);
 		removeRoom.setAction(new RemoveRoomAction(smartBulb, "Remove Room", this));
 		
 		JPanel addBulbPanel = new JPanel();

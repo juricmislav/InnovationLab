@@ -48,6 +48,7 @@ import de.htwg.innovationlab.gui.room.RoomType;
 
 public class SmartBulb extends JFrame implements PHGroupListener {
 	private static final long serialVersionUID = 1L;
+	public static Dimension preferredSize = new Dimension(150, 30);
 	private JTabbedPane tabs = new JTabbedPane();
 	private BridgeController bridgeController = new BridgeController(this);
 	private boolean connected = false;
@@ -78,24 +79,16 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 		setLocation(screenDim.width / 7, screenDim.height / 7);
 		setSize((int) (screenDim.width / 2.2), (int) (screenDim.height / 1.7));
 		setIconImage(icon.getImage());
-
 		initGUI();
+		loadServer();
 		if (!bridgeController.autoConnectToBridge()) {
-			new PreferencesAction(this, "").actionPerformed(
-					new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "", System.currentTimeMillis(), 0));
+			if (!bridgeController.autoConnectToBridge()) {
+				new PreferencesAction(this, "Preferences")
+						.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+			}
 		}
-
-		if (profilePropertiesPath.toFile().exists()) {
-			new ProgressFrame(this);
-		} else {
-			ActionEvent e = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null);
-			setProfile.getAction().actionPerformed(e);
-			add(tabs);
-			refreshProfile();
-		}
-
-		executor = Executors.newSingleThreadScheduledExecutor();
-		executor.scheduleAtFixedRate(periodicTask, 2, 3600, TimeUnit.SECONDS);
+		add(tabs);
+		refreshProfile();
 	}
 
 	private void initGUI() {
@@ -121,10 +114,21 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 		setJMenuBar(menuBar);
 	}
 
-	public void load() {
-		add(tabs);
-		loadProfile();
+	public void loadProfile() {
+		loadProfileProperties();
+		if (profile != null && profile.isAutoAdjustment()) {
+			new SetAutoAdjustment().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+		}
 		refreshProfile();
+	}
+	
+	public void loadServer() {
+		new ProgressFrame(this);
+	}
+	
+	public void setUpProfile() {
+		new SetProfileAction(this, "Set Profile")
+		.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
 	}
 
 	public BridgeController getBridgeController() {
@@ -142,15 +146,20 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 	public void setConnected(boolean connected) {
 		this.connected = connected;
 		profileMenu.setEnabled(true);
-
 		refreshProfile();
 	}
 
 	@Override
 	public void dispose() {
 		bridgeController.terminateInstance();
-		executor.shutdown();
 		saveProfile();
+		if (executor != null) {
+			executor.shutdownNow();
+			while (!executor.isTerminated() || !executor.isShutdown()) {
+				System.out.println("!");
+			}
+			executor = null;
+		}
 		super.dispose();
 	}
 
@@ -188,6 +197,9 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 			tabs.add(" + ", addRoomTab);
 			if (tabs.getTabCount() > 1 && index < tabs.getTabCount())
 				tabs.setSelectedIndex(index);
+			if (index == -1 && tabs.getTabCount() > 0) {
+				tabs.setSelectedIndex(0);
+			}
 		} catch (Exception e) {
 
 		}
@@ -197,7 +209,7 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 		return (Room) tabs.getSelectedComponent();
 	}
 
-	public void loadProfile() {
+	public void loadProfileProperties() {
 		if (!profilePropertiesPath.toFile().exists())
 			return;
 		try {
@@ -272,11 +284,11 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 					sb.append("#bulb\t");
 					sb.append(bulb.getLight().getIdentifier());
 					sb.append("\t");
-					sb.append(bulb.getLight().getLastKnownLightState().getHue());
+					sb.append(bulb.getHue());
 					sb.append("\t");
-					sb.append(bulb.getLight().getLastKnownLightState().getSaturation());
+					sb.append(bulb.getSaturation());
 					sb.append("\t");
-					sb.append(bulb.getLight().getLastKnownLightState().getBrightness());
+					sb.append(bulb.getBrightness());
 					sb.append("\t");
 					sb.append(bulb.getLight().getLastKnownLightState().isOn());
 					sb.append("\t");
@@ -288,20 +300,23 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 		} catch (IOException e) {
 		}
 	}
-	
-	Runnable periodicTask = new Runnable() {
-	    public void run() {
-			if (!profile.isAutoAdjustment()) return;
-	        List<Room> rooms = new ArrayList<>(profile.getRooms());
-	        for (Room room : rooms) {
-	        	for (Bulb bulb : new ArrayList<>(room.getBulbs())) {
-	        		if (bulb.isAutoAdjustment()) {
-	        			bulb.performAutoAdjustment();
-	        		}
-	        	}
-	        }
-	    }
+
+	private Runnable periodicTask = new Runnable() {
+		public void run() {
+			autoAdjustAllLights();
+		}
 	};
+
+	private void autoAdjustAllLights() {
+		List<Room> rooms = new ArrayList<>(profile.getRooms());
+		for (Room room : rooms) {
+			for (Bulb bulb : new ArrayList<>(room.getBulbs())) {
+				if (bulb.isAutoAdjustment()) {
+					bulb.performAutoAdjustment();
+				}
+			}
+		}
+	}
 
 	@Override
 	public void onError(int code, String message) {
@@ -344,6 +359,14 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 			if (profile == null)
 				return;
 			profile.setAutoAdjustment(autoAdjustment.isSelected());
+			if (executor != null) {
+				executor.shutdown();
+				executor = null;
+			}
+			if (autoAdjustment.isSelected()) {
+				executor = Executors.newSingleThreadScheduledExecutor();
+				executor.scheduleAtFixedRate(periodicTask, 2, 10, TimeUnit.SECONDS);
+			}
 		}
 	}
 }

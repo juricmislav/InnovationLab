@@ -40,7 +40,8 @@ public class ProgressFrame extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			if (progressBar.getValue() >= 100) {
 				timer.stop();
-				smartBulb.load();
+				setVisible(false);
+				smartBulb.loadProfile();
 				dispose();
 				return;
 			}
@@ -51,7 +52,7 @@ public class ProgressFrame extends JFrame {
 	@Override
 	public void dispose() {
 		timer.stop();
-		smartBulb.load();
+		smartBulb.loadProfile();
 		super.dispose();
 	}
 }

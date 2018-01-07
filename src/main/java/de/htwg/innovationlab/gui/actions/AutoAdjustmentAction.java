@@ -19,12 +19,17 @@ public class AutoAdjustmentAction extends RootAction {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		bulb.setColor(30000, 224, 224);
+		int hue = 30000;
+		int saturation = 224;
+		int brightness = 224;
+		
 		PHLightState lightState = new PHLightState();
 		lightState.setHue(30000);
 		lightState.setSaturation(224);
 		lightState.setBrightness(224);
 		smartBulb.getBridgeController().updateLightState(bulb.getLight().getIdentifier(), lightState);
+		bulb.setdisplayColorHSBtoRGB(hue, saturation, brightness);
+		bulb.setHSB(hue, saturation, brightness);
 	}
 
 }

@@ -25,6 +25,7 @@ public class PreferencesFrame extends JFrame implements BridgeListener {
 	private JButton autoConnect = new JButton();
 	private JButton disconnect = new JButton();
 	private JButton setup = new JButton();
+	private JButton ok = new JButton("OK");
 	private JTextField status;
 
 	public PreferencesFrame(SmartBulb smartBulb) {
@@ -46,17 +47,26 @@ public class PreferencesFrame extends JFrame implements BridgeListener {
 
 	private void initGUI() {
 		setLayout(new BorderLayout(10, 10));
-
-		Dimension preferredSize = new Dimension(150, 30);
 		JPanel autoConnectPanel = new JPanel();
 		JPanel disconnectPanel = new JPanel();
 		JPanel setupPanel = new JPanel();
-		autoConnect.setPreferredSize(preferredSize);
-		disconnect.setPreferredSize(preferredSize);
-		setup.setPreferredSize(preferredSize);
+		JPanel okPanel = new JPanel();
+		autoConnect.setPreferredSize(SmartBulb.preferredSize);
+		disconnect.setPreferredSize(SmartBulb.preferredSize);
+		setup.setPreferredSize(SmartBulb.preferredSize);
+		ok.setPreferredSize(SmartBulb.preferredSize);
+		ok.setAction(new AbstractAction("OK") {
+			private static final long serialVersionUID = 1L;	
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				dispose();				
+			}
+		});
 		autoConnectPanel.add(autoConnect);
 		disconnectPanel.add(disconnect);
 		setupPanel.add(setup);
+		okPanel.add(ok);
 
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new GridLayout(3, 0));
@@ -64,6 +74,10 @@ public class PreferencesFrame extends JFrame implements BridgeListener {
 		buttonPanel.add(disconnectPanel);
 		buttonPanel.add(setupPanel);
 		add(buttonPanel, BorderLayout.NORTH);
+		JPanel centralPanel = new JPanel();
+		centralPanel.setLayout(new BorderLayout());
+		centralPanel.add(okPanel, BorderLayout.SOUTH);
+		add(centralPanel, BorderLayout.CENTER);
 		
 		initStatusPanel();
 	}
@@ -142,6 +156,10 @@ public class PreferencesFrame extends JFrame implements BridgeListener {
 	@Override
 	public void dispose() {
 		smartBulb.setEnabled(true);
+		setVisible(false);
+		if (smartBulb.isConnected() && smartBulb.getProfile() == null) {
+				smartBulb.setUpProfile();
+		}
 		super.dispose();
 	}
 

@@ -4,38 +4,41 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 
 import javax.swing.JColorChooser;
-import javax.swing.JTextField;
 
-import com.philips.lighting.hue.sdk.utilities.PHUtilities;
-import com.philips.lighting.model.PHLight;
 import com.philips.lighting.model.PHLightState;
 
 import de.htwg.innovationlab.gui.SmartBulb;
+import de.htwg.innovationlab.gui.bulb.Bulb;
 
 public class SetColorAction extends RootAction {
 	private static final long serialVersionUID = 1L;
-	private PHLight light;
-	private JTextField currentColor;
-	
-	public SetColorAction(SmartBulb smartBulb, String name, PHLight light, JTextField currentColor) {
+	private Bulb bulb;
+
+	public SetColorAction(SmartBulb smartBulb, String name, Bulb bulb) {
 		super(smartBulb, name);
-		this.light = light;
-		this.currentColor = currentColor;
+		this.bulb = bulb;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		Color lightColor = JColorChooser.showDialog(smartBulb, "Set Bulb Color", smartBulb.getBackground());
+		Color color = JColorChooser.showDialog(smartBulb, "Set Bulb Color", smartBulb.getBackground());
 
-		if (lightColor != null) {
-			float xy[] = PHUtilities.calculateXYFromRGB(lightColor.getRed(), lightColor.getGreen(),
-					lightColor.getBlue(), "LCT001");
+		if (color != null) {
+			float[] HSB = new float[3];
+			HSB = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), HSB);
 			PHLightState lightState = new PHLightState();
-			lightState.setX(xy[0]);
-			lightState.setY(xy[1]);
-			smartBulb.getBridgeController().updateLightState(light.getIdentifier(), lightState);
-			currentColor.setBackground(new Color(lightColor.getRed(), lightColor.getGreen(),
-					lightColor.getBlue()));
+
+			lightState.setHue((int) Math.round(HSB[0] * Bulb.MAX_HUE));
+			lightState.setSaturation((int) Math.round(HSB[1] * Bulb.MAX_SATURATION));
+			lightState.setBrightness((int) Math.round(HSB[2] * Bulb.MAX_BRIGTHNESS));
+
+			smartBulb.getBridgeController().updateLightState(bulb.getLight().getIdentifier(), lightState);
+			bulb.getCurrentColor().setBackground(new Color(color.getRed(), color.getGreen(), color.getBlue()));
+
+			bulb.setHSB(
+					(int) Math.round(HSB[0] * Bulb.MAX_HUE), 
+					(int) Math.round(HSB[1] * Bulb.MAX_SATURATION), 
+					(int) Math.round(HSB[2] * Bulb.MAX_BRIGTHNESS));
 		}
 	}
 
