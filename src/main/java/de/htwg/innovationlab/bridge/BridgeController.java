@@ -124,6 +124,13 @@ public class BridgeController {
 		if (idn == null || lightState == null) return;
 		bridge.updateLightState(idn, lightState, null);
 	}
+	
+	public void addLightManually(String idn) {
+		if (idn == null || idn.equals("") || bridge == null) return;
+		List<String> serials = new ArrayList<>();
+		serials.add(idn);
+		bridge.findNewLightsWithSerials(serials, null);
+	}
 
 	private PHSDKListener phsdkListener = new PHSDKListener() {
 

@@ -14,7 +14,7 @@ public class ConnectionProperties {
 
 	private String ipAddress;
 	private String userName;
-	private Path path = Paths.get("Connection.properties");
+	private final Path path = Paths.get("Connection.properties");
 
 	public ConnectionProperties() {
 		File file = path.toFile();

@@ -16,11 +16,12 @@ public class ProgressFrame extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private SmartBulb smartBulb;
 	private JProgressBar progressBar = new JProgressBar();
-
+	private boolean executeLoadingProfile;
 	private Timer timer;
 
-	public ProgressFrame(SmartBulb smartBulb) {
+	public ProgressFrame(SmartBulb smartBulb, boolean executeLoadingProfile) {
 		this.smartBulb = smartBulb;
+		this.executeLoadingProfile = executeLoadingProfile;
 		setTitle("Loading");
 		setLocationRelativeTo(smartBulb);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -41,7 +42,10 @@ public class ProgressFrame extends JFrame {
 			if (progressBar.getValue() >= 100) {
 				timer.stop();
 				setVisible(false);
-				smartBulb.loadProfile();
+				if (executeLoadingProfile) {
+					executeLoadingProfile = false;
+					smartBulb.loadProfile();
+				}
 				dispose();
 				return;
 			}
@@ -52,7 +56,9 @@ public class ProgressFrame extends JFrame {
 	@Override
 	public void dispose() {
 		timer.stop();
-		smartBulb.loadProfile();
+		if (executeLoadingProfile) {
+			smartBulb.loadProfile();
+		}
 		super.dispose();
 	}
 }

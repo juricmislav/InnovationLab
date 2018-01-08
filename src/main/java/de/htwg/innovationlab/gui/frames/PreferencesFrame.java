@@ -123,6 +123,7 @@ public class PreferencesFrame extends JFrame implements BridgeListener {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (smartBulb.getBridgeController().autoConnectToBridge()) {
+					smartBulb.loadServer(false);
 					refreshStatus();
 				};
 			}

@@ -35,8 +35,9 @@ import com.philips.lighting.model.PHGroup;
 import com.philips.lighting.model.PHHueError;
 
 import de.htwg.innovationlab.bridge.BridgeController;
-import de.htwg.innovationlab.data.Profile;
+import de.htwg.innovationlab.data.ProfileProperties;
 import de.htwg.innovationlab.data.ProfileType;
+import de.htwg.innovationlab.gui.actions.AddLightBulbManuallyAction;
 import de.htwg.innovationlab.gui.actions.CloseAction;
 import de.htwg.innovationlab.gui.actions.PreferencesAction;
 import de.htwg.innovationlab.gui.actions.SetProfileAction;
@@ -54,11 +55,12 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 	private boolean connected = false;
 	private ImageIcon icon = new ImageIcon("resources/icon.png");
 	private Path profilePropertiesPath = Paths.get("Profile.properties");
-	private Profile profile;
+	private ProfileProperties profileProperties;
 	private AddRoomTab addRoomTab = new AddRoomTab(SmartBulb.this);
 	private JMenu profileMenu = new JMenu("Profile");
 	private JMenuItem setProfile;
 	private JRadioButton autoAdjustment = new JRadioButton("Auto Adjustment");
+	private JMenuItem addLightManually;
 	private ScheduledExecutorService executor;
 
 	public static void main(String[] args) {
@@ -80,15 +82,13 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 		setSize((int) (screenDim.width / 2.2), (int) (screenDim.height / 1.7));
 		setIconImage(icon.getImage());
 		initGUI();
-		loadServer();
+		loadServer(true);
 		if (!bridgeController.autoConnectToBridge()) {
 			if (!bridgeController.autoConnectToBridge()) {
 				new PreferencesAction(this, "Preferences")
 						.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
 			}
 		}
-		add(tabs);
-		refreshProfile();
 	}
 
 	private void initGUI() {
@@ -104,26 +104,30 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 
 		JMenuItem close = new JMenuItem(new CloseAction(this, "Close"));
 		JMenuItem preferences = new JMenuItem(new PreferencesAction(this, "Preferences"));
+		addLightManually = new JMenuItem(new AddLightBulbManuallyAction(this, "Add LightBulb"));
 		setProfile = new JMenuItem(new SetProfileAction(this, "Set Profile"));
 		autoAdjustment.addActionListener(new SetAutoAdjustment());
 		fileMenu.add(close);
 		connectionMenu.add(preferences);
 		profileMenu.add(setProfile);
 		profileMenu.add(autoAdjustment);
+		connectionMenu.addSeparator();
+		connectionMenu.add(addLightManually);
 
 		setJMenuBar(menuBar);
 	}
 
 	public void loadProfile() {
 		loadProfileProperties();
-		if (profile != null && profile.isAutoAdjustment()) {
+		if (profileProperties != null && profileProperties.isAutoAdjustment()) {
 			new SetAutoAdjustment().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
 		}
+		add(tabs);
 		refreshProfile();
 	}
 	
-	public void loadServer() {
-		new ProgressFrame(this);
+	public void loadServer(boolean executeLoadingProfile) {
+		new ProgressFrame(this, executeLoadingProfile);
 	}
 	
 	public void setUpProfile() {
@@ -146,6 +150,7 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 	public void setConnected(boolean connected) {
 		this.connected = connected;
 		profileMenu.setEnabled(true);
+		addLightManually.setEnabled(true);
 		refreshProfile();
 	}
 
@@ -165,24 +170,25 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 
 	public void disconnectBridge() {
 		profileMenu.setEnabled(false);
+		addLightManually.setEnabled(false);
 		connected = false;
 		bridgeController.terminateInstance();
 		bridgeController = new BridgeController(this);
 		refreshProfile();
 	}
 
-	public void setProfile(Profile profile) {
-		this.profile = profile;
+	public void setProfile(ProfileProperties profileProperties) {
+		this.profileProperties = profileProperties;
 		tabs.removeAll();
 	}
 
-	public Profile getProfile() {
-		return profile;
+	public ProfileProperties getProfile() {
+		return profileProperties;
 	}
 
 	public void refreshProfile() {
 		try {
-			if (profile == null || !connected) {
+			if (profileProperties == null || !connected) {
 				tabs.setVisible(false);
 				return;
 			}
@@ -190,7 +196,7 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 			tabs.setVisible(true);
 			tabs.removeAll();
 
-			for (Room room : profile.getRooms()) {
+			for (Room room : profileProperties.getRooms()) {
 				tabs.add(" " + room.getName() + " ", room);
 			}
 
@@ -222,8 +228,8 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 					String[] values = line.split("\t");
 					if (values.length != 4)
 						return;
-					profile = new Profile(values[1], ProfileType.valueOf(values[2]));
-					profile.setAutoAdjustment(Boolean.valueOf(values[3]));
+					profileProperties = new ProfileProperties(values[1], ProfileType.valueOf(values[2]));
+					profileProperties.setAutoAdjustment(Boolean.valueOf(values[3]));
 					autoAdjustment.setSelected(Boolean.valueOf(values[3]));
 				}
 				if (line.startsWith("#room")) {
@@ -231,15 +237,15 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 					if (values.length != 3)
 						return;
 					lastRoom = new Room(values[1], RoomType.valueOf(values[2]), this);
-					profile.addRoom(lastRoom);
+					profileProperties.addRoom(lastRoom);
 				}
 				if (line.startsWith("#bulb")) {
 					String[] values = line.split("\t");
-					if (values.length != 7 || !bridgeController.containtsLight(values[1]))
+					if (values.length != 8 || !bridgeController.containtsLight(values[1]))
 						return;
 					Bulb bulb = new Bulb(bridgeController.getLight(values[1]), lastRoom, this,
 							Integer.valueOf(values[2]), Integer.valueOf(values[3]), Integer.valueOf(values[4]),
-							Boolean.valueOf(values[5]), Boolean.valueOf(values[6]));
+							Boolean.valueOf(values[5]), Boolean.valueOf(values[6]), Boolean.valueOf(values[7]));
 					lastRoom.addBulb(bulb);
 				}
 			}
@@ -249,7 +255,7 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 	}
 
 	private void saveProfile() {
-		if (profile == null)
+		if (profileProperties == null)
 			return;
 		File file = profilePropertiesPath.toFile();
 		if (!file.exists()) {
@@ -264,14 +270,14 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 				new OutputStreamWriter(new FileOutputStream(profilePropertiesPath.toString()), "utf-8"))) {
 			StringBuilder sb = new StringBuilder();
 			sb.append("#profile\t");
-			sb.append(profile.getName());
+			sb.append(profileProperties.getName());
 			sb.append("\t");
-			sb.append(profile.getProfileType());
+			sb.append(profileProperties.getProfileType());
 			sb.append("\t");
-			sb.append(profile.isAutoAdjustment());
+			sb.append(profileProperties.isAutoAdjustment());
 			writer.println(sb.toString());
 
-			for (Room room : profile.getRooms()) {
+			for (Room room : profileProperties.getRooms()) {
 				sb = new StringBuilder();
 				sb.append("#room\t");
 				sb.append(room.getName());
@@ -293,6 +299,8 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 					sb.append(bulb.getLight().getLastKnownLightState().isOn());
 					sb.append("\t");
 					sb.append(bulb.isAutoAdjustment());
+					sb.append("\t");
+					sb.append(bulb.isOn());
 					writer.println(sb.toString());
 				}
 			}
@@ -303,12 +311,13 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 
 	private Runnable periodicTask = new Runnable() {
 		public void run() {
-			autoAdjustAllLights();
+			if (connected)
+				autoAdjustAllLights();
 		}
 	};
 
 	private void autoAdjustAllLights() {
-		List<Room> rooms = new ArrayList<>(profile.getRooms());
+		List<Room> rooms = new ArrayList<>(profileProperties.getRooms());
 		for (Room room : rooms) {
 			for (Bulb bulb : new ArrayList<>(room.getBulbs())) {
 				if (bulb.isAutoAdjustment()) {
@@ -356,9 +365,9 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 
 	private class SetAutoAdjustment implements ActionListener {
 		public void actionPerformed(ActionEvent event) {
-			if (profile == null)
+			if (profileProperties == null)
 				return;
-			profile.setAutoAdjustment(autoAdjustment.isSelected());
+			profileProperties.setAutoAdjustment(autoAdjustment.isSelected());
 			if (executor != null) {
 				executor.shutdown();
 				executor = null;

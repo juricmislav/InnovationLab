@@ -2,26 +2,27 @@ package de.htwg.innovationlab.gui.actions;
 
 import java.awt.event.ActionEvent;
 
-import com.philips.lighting.model.PHLight;
 import com.philips.lighting.model.PHLightState;
 
 import de.htwg.innovationlab.gui.SmartBulb;
+import de.htwg.innovationlab.gui.bulb.Bulb;
 
 public class SwitchBulbAction extends RootAction {
 
 	private static final long serialVersionUID = 1L;
-	private PHLight light;
+	private Bulb bulb;
 
-	public SwitchBulbAction(SmartBulb smartBulb, String name, PHLight light) {
+	public SwitchBulbAction(SmartBulb smartBulb, String name, Bulb bulb) {
 		super(smartBulb, name);
-		this.light = light;
+		this.bulb = bulb;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		PHLightState lightState = new PHLightState();
-		lightState.setOn(!light.getLastKnownLightState().isOn());
-		smartBulb.getBridgeController().updateLightState(light.getIdentifier(), lightState);
+		lightState.setOn(!bulb.isOn());
+		bulb.setOn(!bulb.isOn());
+		smartBulb.getBridgeController().updateLightState(bulb.getLight().getIdentifier(), lightState);
 	}
 
 }

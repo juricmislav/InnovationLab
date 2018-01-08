@@ -3,6 +3,7 @@ package de.htwg.innovationlab.gui.bulb;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 
 import javax.swing.BorderFactory;
@@ -38,6 +39,7 @@ public class Bulb extends JPanel {
 	private int hue;
 	private int saturation;
 	private int brightness;
+	private boolean isOn;
 	public static final float MAX_HUE = 65534;
 	public static final float MAX_SATURATION = 254;
 	public static final float MAX_BRIGTHNESS = 254;
@@ -49,20 +51,24 @@ public class Bulb extends JPanel {
 		this.hue = light.getLastKnownLightState().getHue();
 		this.saturation = light.getLastKnownLightState().getSaturation();
 		this.brightness = light.getLastKnownLightState().getBrightness();
+		this.isOn = light.getLastKnownLightState().isOn();
 
 		initGui();
 		setdisplayColorHSBtoRGB(light.getLastKnownLightState().getHue(), light.getLastKnownLightState().getSaturation(),
 				light.getLastKnownLightState().getBrightness());
 		switchButton.setSelected(light.getLastKnownLightState().isOn());
+		switchButton.setSelected(isOn);
 	}
 
-	public Bulb(PHLight light, Room room, SmartBulb smartBulb, int hue, int saturation, int brightness, boolean state, boolean autoAdjustment) {
+	public Bulb(PHLight light, Room room, SmartBulb smartBulb, int hue, int saturation, int brightness, 
+			boolean state, boolean autoAdjustment, boolean isOn) {
 		this.light = light;
 		this.room = room;
 		this.smartBulb = smartBulb;
 		this.hue = hue;
 		this.saturation = saturation;
 		this.brightness = brightness;
+		this.isOn = isOn;
 
 		initGui();
 		setdisplayColorHSBtoRGB(hue, saturation, brightness);
@@ -72,13 +78,20 @@ public class Bulb extends JPanel {
 		lightState.setHue(hue);
 		lightState.setSaturation(saturation);
 		lightState.setBrightness(brightness);
+		lightState.setOn(isOn);
 		smartBulb.getBridgeController().updateLightState(light.getIdentifier(), lightState);
 		autoAdjustmentCheckBox.setSelected(autoAdjustment);
+		switchButton.setSelected(isOn);
 	}
 
 	public void setdisplayColorHSBtoRGB(int hue, int saturation, int brightness) {
-		displayColor.setBackground(
-				Color.getHSBColor(hue / MAX_HUE, saturation / MAX_SATURATION, brightness / MAX_BRIGTHNESS));
+		displayColor.setText("");
+		int col = Color.HSBtoRGB(hue / (float)MAX_HUE, saturation / (float)MAX_SATURATION, brightness / (float)MAX_BRIGTHNESS);
+		displayColor.setBackground(new Color(Math.abs(col)));
+	}
+	
+	public void autoAdjusted() {
+		displayColor.setText("Auto Adjusted");
 	}
 
 	private void initGui() {
@@ -98,7 +111,7 @@ public class Bulb extends JPanel {
 		removeBulb.setPreferredSize(preferredSize);
 		removeBulb.setAction(new RemoveBulbAction(smartBulb, "Remove Bulb", room, this));
 
-		switchButton.setAction(new SwitchBulbAction(smartBulb, "On / Off", light));
+		switchButton.setAction(new SwitchBulbAction(smartBulb, "On / Off", this));
 		switchButton.setPreferredSize(preferredSize);
 
 		instantAutoAdjustment = new JButton();
@@ -106,6 +119,8 @@ public class Bulb extends JPanel {
 		instantAutoAdjustment.setAction(new AutoAdjustmentAction(smartBulb, "Adjust now", this));
 
 		displayColor.setEnabled(false);
+		displayColor.setHorizontalAlignment(JTextField.CENTER);
+		displayColor.setFont(new Font(displayColor.getFont().getFontName(), Font.ITALIC, displayColor.getFont().getSize()));
 		displayColor.setPreferredSize(preferredSize);
 
 		Border bulbPanelBorder = BorderFactory.createTitledBorder("Lightbulb: " + light.getIdentifier());
@@ -195,8 +210,19 @@ public class Bulb extends JPanel {
 		this.brightness = brightness;
 	}
 	
-	public JTextField getCurrentColor() {
+	public JTextField getDisplayColor() {
 		return displayColor;
 	}
+
+	public Room getRoom() {
+		return room;
+	}
 	
+	public boolean isOn() {
+		return isOn;
+	}
+	
+	public void setOn(boolean isOn) {
+		this.isOn = isOn;
+	}
 }

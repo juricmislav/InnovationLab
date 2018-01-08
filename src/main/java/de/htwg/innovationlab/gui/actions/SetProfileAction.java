@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
-import de.htwg.innovationlab.data.Profile;
+import de.htwg.innovationlab.data.ProfileProperties;
 import de.htwg.innovationlab.data.ProfileType;
 import de.htwg.innovationlab.gui.SmartBulb;
 
@@ -62,7 +62,7 @@ public class SetProfileAction extends RootAction {
 		
 		if (result == JOptionPane.OK_OPTION && !nameText.equals("")) {
 			if (smartBulb.getProfile() == null) {
-				smartBulb.setProfile(new Profile(nameText, profileTypes.get(comboBox.getSelectedIndex())));		
+				smartBulb.setProfile(new ProfileProperties(nameText, profileTypes.get(comboBox.getSelectedIndex())));		
 			} else {
 				smartBulb.getProfile().setName(nameText);
 				smartBulb.getProfile().setProfileType(profileTypes.get(comboBox.getSelectedIndex()));
