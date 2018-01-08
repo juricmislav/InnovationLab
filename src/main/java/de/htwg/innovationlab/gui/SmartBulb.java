@@ -49,7 +49,7 @@ import de.htwg.innovationlab.gui.room.RoomType;
 
 public class SmartBulb extends JFrame implements PHGroupListener {
 	private static final long serialVersionUID = 1L;
-	public static Dimension preferredSize = new Dimension(150, 30);
+	public static final Dimension preferredSize = new Dimension(150, 30);
 	private JTabbedPane tabs = new JTabbedPane();
 	private BridgeController bridgeController = new BridgeController(this);
 	private boolean connected = false;
