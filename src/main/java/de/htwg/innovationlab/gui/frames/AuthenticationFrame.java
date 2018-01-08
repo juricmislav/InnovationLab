@@ -4,7 +4,7 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.net.URL;
 
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
@@ -16,9 +16,9 @@ public class AuthenticationFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 
-	private final String imagePath = "resources/pushlink_image.png";
+	private URL imagePath = SmartBulb.class.getResource("/pushlink_image.png");
 	
-	public AuthenticationFrame(SmartBulb smartBulb) {
+	public AuthenticationFrame(SmartBulb smartBulb) {		
 		setTitle("Authentication");
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setLocationRelativeTo(null);
@@ -45,7 +45,7 @@ public class AuthenticationFrame extends JFrame {
 	private Image getImage() {
 		Image image = null;
 		try {
-			image = ImageIO.read(Paths.get(imagePath).toFile());
+			image = ImageIO.read(imagePath);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

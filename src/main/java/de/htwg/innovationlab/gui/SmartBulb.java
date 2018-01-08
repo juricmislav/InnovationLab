@@ -53,7 +53,7 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 	private JTabbedPane tabs = new JTabbedPane();
 	private BridgeController bridgeController = new BridgeController(this);
 	private boolean connected = false;
-	private ImageIcon icon = new ImageIcon("resources/icon.png");
+	private ImageIcon icon = new ImageIcon(SmartBulb.class.getResource("/icon.png"));
 	private Path profilePropertiesPath = Paths.get("Profile.properties");
 	private ProfileProperties profileProperties;
 	private AddRoomTab addRoomTab = new AddRoomTab(SmartBulb.this);
@@ -161,7 +161,7 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 		if (executor != null) {
 			executor.shutdownNow();
 			while (!executor.isTerminated() || !executor.isShutdown()) {
-				System.out.println("!");
+				executor.shutdownNow();
 			}
 			executor = null;
 		}

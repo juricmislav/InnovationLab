@@ -46,7 +46,7 @@ public class EditRoomAction extends RootAction {
 		dialogPanel.add(comboBox);
 		
 		int result = JOptionPane.showConfirmDialog(smartBulb, dialogPanel, "Edit Room", 
-				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, new ImageIcon("resources/room.png"));
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, new ImageIcon(SmartBulb.class.getResource("/room.png")));
 		
 		String nameText = name.getText().trim().replaceAll("\\s+", " ");
 		if (result == JOptionPane.OK_OPTION && (nameText.equals("") || 
