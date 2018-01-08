@@ -30,7 +30,6 @@ public class SetColorAction extends RootAction {
 
 			lightState.setHue((int) Math.round(HSB[0] * Bulb.MAX_HUE));
 			lightState.setSaturation((int) Math.round(HSB[1] * Bulb.MAX_SATURATION));
-			lightState.setBrightness((int) Math.round(HSB[2] * Bulb.MAX_BRIGTHNESS));
 
 			smartBulb.getBridgeController().updateLightState(bulb.getLight().getIdentifier(), lightState);
 			bulb.getDisplayColor().setBackground(new Color(color.getRed(), color.getGreen(), color.getBlue()));

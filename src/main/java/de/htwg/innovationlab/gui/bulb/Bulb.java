@@ -61,7 +61,7 @@ public class Bulb extends JPanel {
 	}
 
 	public Bulb(PHLight light, Room room, SmartBulb smartBulb, int hue, int saturation, int brightness, 
-			boolean state, boolean autoAdjustment, boolean isOn) {
+			int r, int g, int b, boolean state, boolean autoAdjustment, boolean isOn) {
 		this.light = light;
 		this.room = room;
 		this.smartBulb = smartBulb;
@@ -71,7 +71,6 @@ public class Bulb extends JPanel {
 		this.isOn = isOn;
 
 		initGui();
-		setdisplayColorHSBtoRGB(hue, saturation, brightness);
 		switchButton.setSelected(state);
 		PHLightState lightState = new PHLightState();
 		lightState.setOn(state);
@@ -82,12 +81,18 @@ public class Bulb extends JPanel {
 		smartBulb.getBridgeController().updateLightState(light.getIdentifier(), lightState);
 		autoAdjustmentCheckBox.setSelected(autoAdjustment);
 		switchButton.setSelected(isOn);
+		displayColor.setBackground(new Color(r, g, b));
 	}
 
 	public void setdisplayColorHSBtoRGB(int hue, int saturation, int brightness) {
 		displayColor.setText("");
 		int col = Color.HSBtoRGB(hue / (float)MAX_HUE, saturation / (float)MAX_SATURATION, brightness / (float)MAX_BRIGTHNESS);
 		displayColor.setBackground(new Color(Math.abs(col)));
+	}
+	
+	public void setDisplayColorRGB(int r, int g, int b) {
+		displayColor.setText("");
+		displayColor.setBackground(new Color(r, g, b));
 	}
 	
 	public void autoAdjusted() {
@@ -224,5 +229,17 @@ public class Bulb extends JPanel {
 	
 	public void setOn(boolean isOn) {
 		this.isOn = isOn;
+	}
+	
+	public int getR() {
+		return displayColor.getBackground().getRed();
+	}
+	
+	public int getG() {
+		return displayColor.getBackground().getGreen();
+	}
+	
+	public int getB() {
+		return displayColor.getBackground().getBlue();
 	}
 }

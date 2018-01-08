@@ -16,12 +16,18 @@ public class AutoAdjustmentAction extends RootAction {
 
 	private static final long serialVersionUID = 1L;
 	private Bulb bulb;
-	private final int hueDefault = 30000;
+	private final int hueDefault = 24029;
 	private final int saturationDefault = 254;
-	private final int brightnessDefault = 155;
+	private final int brightnessDefault = 200;
+	private final int redDefault = 0;
+	private final int greenDefault = 255;
+	private final int blueDefault = 51;
 	private int hue = hueDefault;
 	private int saturation = saturationDefault;
 	private int brightness = brightnessDefault;
+	private int red = redDefault;
+	private int green = greenDefault;
+	private int blue = blueDefault;
 
 	public AutoAdjustmentAction(SmartBulb smartBulb, String name, Bulb bulb) {
 		super(smartBulb, name);
@@ -37,8 +43,9 @@ public class AutoAdjustmentAction extends RootAction {
 		lightState.setHue(hue);
 		lightState.setSaturation(saturation);
 		lightState.setBrightness(brightness);
+		bulb.setBrightness(brightness);
 		smartBulb.getBridgeController().updateLightState(bulb.getLight().getIdentifier(), lightState);
-		bulb.setdisplayColorHSBtoRGB(hue, saturation, brightness);
+		bulb.setDisplayColorRGB(red, green, blue);
 		bulb.setHSB(hue, saturation, brightness);
 		bulb.autoAdjusted();
 	}
@@ -69,44 +76,75 @@ public class AutoAdjustmentAction extends RootAction {
 			if (roomType.equals(RoomType.LIVINGROOM)) {
 				hue = 8738;
 				saturation = 254;
+				red = 255;
+				green = 204;
+				blue = 0;
 			} 
 			if (roomType.equals(RoomType.HALLWAY)) {
-				hue = 32767;
-				saturation = 254;
+				hue = 13653;
+				saturation = 203;
+				red = 204;
+				green = 255;
+				blue = 51;
 			}
 			if (roomType.equals(RoomType.TOILET)) {
-				hue = 13653;
-				saturation = 254;
+				hue = 32767;
+				saturation = 152;
+				red = 102;
+				green = 255;
+				blue = 255;
 			}
 			if (roomType.equals(RoomType.KITCHEN)) {
-				hue = 32767;
+				hue = 0;
 				saturation = 102;
+				red = 255;
+				green = 153;
+				blue = 153;
 			}
 			if (roomType.equals(RoomType.BEDROOM)) {
-				hue = 36408;
-				saturation = 152;
+				hue = 43689;
+				saturation = 102;
+				red = 153;
+				green = 153;
+				blue = 255;
 			}
 		}
 		if (profileType == ProfileType.GAMER) {
-			hue = 43689;
-			saturation = 110;
+			hue = 49151;
+			saturation = 254;
+			red = 51;
+			green = 0;
+			blue = 102;
 		}
 		if (profileType == ProfileType.ROMANTIC) {
 			if (roomType.equals(RoomType.TOILET)) {
-				hue = 13653;
+				hue = 2184;
 				saturation = 254;
+				red = 255;
+				green = 51;
+				blue = 0;
 			} else {
-				hue = 0;
+				hue = 63350;
 				saturation = 254;
+				red = 255;
+				green = 0;
+				blue = 51;
+				
 			}
 		}
 		if (profileType == ProfileType.PARTY) {
 			if (roomType.equals(RoomType.TOILET)) {
-				hue = 43689;
-				saturation = 110;
+				hue = 32767;
+				saturation = 254;
+				red = 0;
+				green = 204;
+				blue = 204;
 			} else {
 				hue = 54612;
 				saturation = 254;
+				red = 153;
+				green = 0;
+				blue = 153;
 			}
 		}
 	}

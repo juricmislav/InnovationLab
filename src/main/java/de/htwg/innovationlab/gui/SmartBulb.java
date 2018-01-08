@@ -241,11 +241,12 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 				}
 				if (line.startsWith("#bulb")) {
 					String[] values = line.split("\t");
-					if (values.length != 8 || !bridgeController.containtsLight(values[1]))
+					if (values.length != 11 || !bridgeController.containtsLight(values[1]))
 						return;
 					Bulb bulb = new Bulb(bridgeController.getLight(values[1]), lastRoom, this,
 							Integer.valueOf(values[2]), Integer.valueOf(values[3]), Integer.valueOf(values[4]),
-							Boolean.valueOf(values[5]), Boolean.valueOf(values[6]), Boolean.valueOf(values[7]));
+							Integer.valueOf(values[5]), Integer.valueOf(values[6]), Integer.valueOf(values[7]),
+							Boolean.valueOf(values[8]), Boolean.valueOf(values[9]), Boolean.valueOf(values[10]));
 					lastRoom.addBulb(bulb);
 				}
 			}
@@ -295,6 +296,12 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 					sb.append(bulb.getSaturation());
 					sb.append("\t");
 					sb.append(bulb.getBrightness());
+					sb.append("\t");
+					sb.append(bulb.getR());
+					sb.append("\t");
+					sb.append(bulb.getG());
+					sb.append("\t");
+					sb.append(bulb.getB());
 					sb.append("\t");
 					sb.append(bulb.getLight().getLastKnownLightState().isOn());
 					sb.append("\t");
