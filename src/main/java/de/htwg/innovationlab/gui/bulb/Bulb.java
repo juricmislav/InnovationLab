@@ -47,7 +47,7 @@ public class Bulb extends JPanel {
 	private JToggleButton switchButton = new JToggleButton();
 	private JRadioButton autoAdjustmentCheckBox = new JRadioButton("Auto Adjustment");
 	private JButton instantAutoAdjustment;
-	private JButton nameDisplay = new JButton();
+	private JLabel nameDisplay = new JLabel();
 	private int hue;
 	private int saturation;
 	private int brightness;
@@ -130,8 +130,11 @@ public class Bulb extends JPanel {
 		removeBulb.setPreferredSize(SmartBulb.PREFERRED_SIZE);
 		removeBulb.setAction(new RemoveBulbAction(smartBulb, "Remove Bulb", room, this));
 
-		nameDisplay.setPreferredSize(SmartBulb.PREFERRED_SIZE);
-		nameDisplay.addActionListener(new RenameLight());
+		JButton renameButton = new JButton("Rename");
+		renameButton.setPreferredSize(SmartBulb.PREFERRED_SIZE);
+		renameButton.addActionListener(new RenameLight());
+		
+		nameDisplay.setFocusable(false);
 
 		switchButton.setAction(new SwitchBulbAction(smartBulb, "On / Off", this));
 		switchButton.setPreferredSize(SmartBulb.PREFERRED_SIZE);
@@ -176,8 +179,11 @@ public class Bulb extends JPanel {
 		JPanel autoAdjustmentPanel = new JPanel();
 		autoAdjustmentPanel.add(instantAutoAdjustment);
 		
-		JPanel renamePanel = new JPanel();
-		renamePanel.add(nameDisplay);
+		JPanel nameDisplayPanel = new JPanel();
+		nameDisplayPanel.add(nameDisplay);
+		
+		JPanel renameBulbPanel = new JPanel();
+		renameBulbPanel.add(renameButton);
 
 		JPanel midCentralPanel = new JPanel();
 		midCentralPanel.setLayout(new BorderLayout());
@@ -186,13 +192,18 @@ public class Bulb extends JPanel {
 		
 		JPanel centralPanel = new JPanel();
 		centralPanel.setLayout(new BorderLayout());
-		centralPanel.add(renamePanel, BorderLayout.NORTH);
+		centralPanel.add(nameDisplayPanel, BorderLayout.NORTH);
 		centralPanel.add(midCentralPanel, BorderLayout.CENTER);
+		
+		JPanel eastMidPanel = new JPanel();
+		eastMidPanel.setLayout(new BorderLayout());
+		eastMidPanel.add(autoAdjustmentCheckBoxPanel, BorderLayout.NORTH);
+		eastMidPanel.add(removeBulbPanel, BorderLayout.CENTER);
 
 		JPanel eastPanel = new JPanel();
 		eastPanel.setLayout(new BorderLayout());
-		eastPanel.add(removeBulbPanel, BorderLayout.NORTH);
-		eastPanel.add(autoAdjustmentCheckBoxPanel, BorderLayout.CENTER);
+		eastPanel.add(renameBulbPanel, BorderLayout.NORTH);
+		eastPanel.add(eastMidPanel, BorderLayout.CENTER);
 
 		add(westPanel, BorderLayout.WEST);
 		add(eastPanel, BorderLayout.EAST);
