@@ -18,6 +18,13 @@ import de.htwg.innovationlab.data.ProfileProperties;
 import de.htwg.innovationlab.data.ProfileType;
 import de.htwg.innovationlab.gui.SmartBulb;
 
+/**
+ * Innovation Lab Project 2017/2018
+ * HTWG Konstanz, University of Applied Sciences
+ *
+ * @author Mislav Jurić
+ * @version 1.0
+ */
 public class SetProfileAction extends RootAction {
 
 	public SetProfileAction(SmartBulb smartBulb, String name) {

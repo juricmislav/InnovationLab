@@ -47,9 +47,16 @@ import de.htwg.innovationlab.gui.room.AddRoomTab;
 import de.htwg.innovationlab.gui.room.Room;
 import de.htwg.innovationlab.gui.room.RoomType;
 
+/**
+ * Innovation Lab Project 2017/2018
+ * HTWG Konstanz, University of Applied Sciences
+ *
+ * @author Mislav Jurić
+ * @version 1.0
+ */
 public class SmartBulb extends JFrame implements PHGroupListener {
 	private static final long serialVersionUID = 1L;
-	public static final Dimension preferredSize = new Dimension(150, 30);
+	public static final Dimension PREFERRED_SIZE = new Dimension(150, 30);
 	private JTabbedPane tabs = new JTabbedPane();
 	private BridgeController bridgeController = new BridgeController(this);
 	private boolean connected = false;
@@ -241,12 +248,12 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 				}
 				if (line.startsWith("#bulb")) {
 					String[] values = line.split("\t");
-					if (values.length != 11 || !bridgeController.containtsLight(values[1]))
+					if (values.length != 12 || !bridgeController.containtsLight(values[1]))
 						return;
-					Bulb bulb = new Bulb(bridgeController.getLight(values[1]), lastRoom, this,
-							Integer.valueOf(values[2]), Integer.valueOf(values[3]), Integer.valueOf(values[4]),
-							Integer.valueOf(values[5]), Integer.valueOf(values[6]), Integer.valueOf(values[7]),
-							Boolean.valueOf(values[8]), Boolean.valueOf(values[9]), Boolean.valueOf(values[10]));
+					Bulb bulb = new Bulb(bridgeController.getLight(values[1]), values[2], lastRoom, this,
+							Integer.valueOf(values[3]), Integer.valueOf(values[4]), Integer.valueOf(values[5]),
+							Integer.valueOf(values[6]), Integer.valueOf(values[7]), Integer.valueOf(values[8]),
+							Boolean.valueOf(values[9]), Boolean.valueOf(values[10]), Boolean.valueOf(values[11]));
 					lastRoom.addBulb(bulb);
 				}
 			}
@@ -290,6 +297,8 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 					sb = new StringBuilder();
 					sb.append("#bulb\t");
 					sb.append(bulb.getLight().getIdentifier());
+					sb.append("\t");
+					sb.append(bulb.getName().substring(6));
 					sb.append("\t");
 					sb.append(bulb.getHue());
 					sb.append("\t");
@@ -385,4 +394,5 @@ public class SmartBulb extends JFrame implements PHGroupListener {
 			}
 		}
 	}
+	
 }

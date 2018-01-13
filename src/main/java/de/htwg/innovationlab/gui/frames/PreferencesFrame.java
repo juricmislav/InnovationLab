@@ -15,10 +15,18 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.philips.lighting.hue.sdk.PHAccessPoint;
+import com.philips.lighting.model.PHBridge;
 
 import de.htwg.innovationlab.bridge.BridgeListener;
 import de.htwg.innovationlab.gui.SmartBulb;
 
+/**
+ * Innovation Lab Project 2017/2018
+ * HTWG Konstanz, University of Applied Sciences
+ *
+ * @author Mislav Jurić
+ * @version 1.0
+ */
 public class PreferencesFrame extends JFrame implements BridgeListener {
 	private static final long serialVersionUID = 1L;
 	private SmartBulb smartBulb;
@@ -51,10 +59,10 @@ public class PreferencesFrame extends JFrame implements BridgeListener {
 		JPanel disconnectPanel = new JPanel();
 		JPanel setupPanel = new JPanel();
 		JPanel okPanel = new JPanel();
-		autoConnect.setPreferredSize(SmartBulb.preferredSize);
-		disconnect.setPreferredSize(SmartBulb.preferredSize);
-		setup.setPreferredSize(SmartBulb.preferredSize);
-		ok.setPreferredSize(SmartBulb.preferredSize);
+		autoConnect.setPreferredSize(SmartBulb.PREFERRED_SIZE);
+		disconnect.setPreferredSize(SmartBulb.PREFERRED_SIZE);
+		setup.setPreferredSize(SmartBulb.PREFERRED_SIZE);
+		ok.setPreferredSize(SmartBulb.PREFERRED_SIZE);
 		ok.setAction(new AbstractAction("OK") {
 			private static final long serialVersionUID = 1L;	
 			
@@ -102,13 +110,24 @@ public class PreferencesFrame extends JFrame implements BridgeListener {
 	public void refreshStatus() {
 		if (smartBulb.isConnected()) {
 			status.setForeground(Color.GREEN);
-			status.setText("Connected");
+			PHBridge bridge = smartBulb.getBridgeController().getBridge();
+			String bridgeIP = "";
+			String bridgeID = "";
+			if (bridge != null) {
+				try {
+					bridgeIP = bridge.getResourceCache().getBridgeConfiguration().getIpAddress();
+					bridgeID = bridge.getResourceCache().getBridgeConfiguration().getBridgeID();
+				} catch (Exception e) {
+
+				}
+			}
+			status.setText("Connected | IP:" + bridgeIP + " | ID: " + bridgeID);
 			autoConnect.setEnabled(false);
 			disconnect.setEnabled(true);
 			setup.setEnabled(false);
 		} else {
 			status.setForeground(Color.RED);
-			status.setText("Not Connected");
+			status.setText("Disconnected");
 			autoConnect.setEnabled(smartBulb.getBridgeController().propertiesDefined());
 			disconnect.setEnabled(false);
 			setup.setEnabled(true);

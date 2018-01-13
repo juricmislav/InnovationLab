@@ -17,6 +17,13 @@ import de.htwg.innovationlab.gui.actions.EditRoomAction;
 import de.htwg.innovationlab.gui.actions.RemoveRoomAction;
 import de.htwg.innovationlab.gui.bulb.Bulb;
 
+/**
+ * Innovation Lab Project 2017/2018
+ * HTWG Konstanz, University of Applied Sciences
+ *
+ * @author Mislav Jurić
+ * @version 1.0
+ */
 public class Room extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private RoomType roomType;
@@ -42,15 +49,15 @@ public class Room extends JPanel {
 		setLayout(new BorderLayout());
 
 		JButton addBulb = new JButton();
-		addBulb.setPreferredSize(SmartBulb.preferredSize);
+		addBulb.setPreferredSize(SmartBulb.PREFERRED_SIZE);
 		addBulb.setAction(new AddLightBulbAction(smartBulb, "Add LightBulb"));
 		
 		JButton editRoom = new JButton();
-		editRoom.setPreferredSize(SmartBulb.preferredSize);
+		editRoom.setPreferredSize(SmartBulb.PREFERRED_SIZE);
 		editRoom.setAction(new EditRoomAction(smartBulb, "Edit Room", this));
 		
 		JButton removeRoom = new JButton();
-		removeRoom.setPreferredSize(SmartBulb.preferredSize);
+		removeRoom.setPreferredSize(SmartBulb.PREFERRED_SIZE);
 		removeRoom.setAction(new RemoveRoomAction(smartBulb, "Remove Room", this));
 		
 		JPanel addBulbPanel = new JPanel();

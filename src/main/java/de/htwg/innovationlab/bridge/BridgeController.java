@@ -4,11 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JOptionPane;
+
+import com.philips.lighting.hue.listener.PHLightListener;
 import com.philips.lighting.hue.sdk.PHAccessPoint;
 import com.philips.lighting.hue.sdk.PHBridgeSearchManager;
 import com.philips.lighting.hue.sdk.PHHueSDK;
 import com.philips.lighting.hue.sdk.PHSDKListener;
 import com.philips.lighting.model.PHBridge;
+import com.philips.lighting.model.PHBridgeResource;
+import com.philips.lighting.model.PHHueError;
 import com.philips.lighting.model.PHHueParsingError;
 import com.philips.lighting.model.PHLight;
 import com.philips.lighting.model.PHLightState;
@@ -16,6 +21,13 @@ import com.philips.lighting.model.PHLightState;
 import de.htwg.innovationlab.data.ConnectionProperties;
 import de.htwg.innovationlab.gui.SmartBulb;
 
+/**
+ * Innovation Lab Project 2017/2018
+ * HTWG Konstanz, University of Applied Sciences
+ *
+ * @author Mislav Jurić
+ * @version 1.0
+ */
 public class BridgeController {
 	private SmartBulb smartBulb;
 	private PHHueSDK pHHueSDK;
@@ -37,13 +49,16 @@ public class BridgeController {
 				listener.terminate();
 			}
 		}
-		try {
-			pHHueSDK.getNotificationManager().unregisterSDKListener(phsdkListener);
-			pHHueSDK.stopPushlinkAuthentication();
-			pHHueSDK.destroySDK();
-		} catch (Exception e) {
-
+		if (pHHueSDK != null) {
+			try {
+				pHHueSDK.getNotificationManager().unregisterSDKListener(phsdkListener);
+				pHHueSDK.stopPushlinkAuthentication();
+				pHHueSDK.destroySDK();
+			} catch (Exception e) {
+				System.out.println(e);
+			}
 		}
+		pHHueSDK = null;
 		bridge = null;
 	}
 
@@ -74,9 +89,10 @@ public class BridgeController {
 	public boolean autoConnectToBridge() {
 		String ipAddress = connectionProperties.getIpAdress();
 		String userName = connectionProperties.getUserName();
-		if (ipAddress == null || userName == null)
+		String macAddress = connectionProperties.getMacAddress();
+		if (ipAddress == null || userName == null || macAddress == null)
 			return false;
-		PHAccessPoint accessPoint = new PHAccessPoint(ipAddress, userName, null);
+		PHAccessPoint accessPoint = new PHAccessPoint(ipAddress, userName, macAddress);
 		pHHueSDK.connect(accessPoint);
 		return true;
 	}
@@ -87,6 +103,7 @@ public class BridgeController {
 
 	public void connectToBridge(PHAccessPoint accessPoint) {
 		connectionProperties.setIpAddress(accessPoint.getIpAddress());
+		connectionProperties.setMacAddress(accessPoint.getMacAddress());
 		accessPoint.setUsername(connectionProperties.getUserName());
 		pHHueSDK.connect(accessPoint);
 	}
@@ -129,7 +146,7 @@ public class BridgeController {
 		if (idn == null || idn.equals("") || bridge == null) return;
 		List<String> serials = new ArrayList<>();
 		serials.add(idn);
-		bridge.findNewLightsWithSerials(serials, null);
+		bridge.findNewLightsWithSerials(serials, getLightListener());
 	}
 
 	private PHSDKListener phsdkListener = new PHSDKListener() {
@@ -155,6 +172,7 @@ public class BridgeController {
 
 		@Override
 		public void onBridgeConnected(PHBridge bridge, String username) {
+			BridgeController.this.bridge = bridge;
 			smartBulb.setConnected(true);
 			connectionProperties.setUserName(username);
 			connectionProperties.saveProperties();
@@ -163,7 +181,6 @@ public class BridgeController {
 					listener.bridgeConnected();
 				}
 			}
-			BridgeController.this.bridge = bridge;
 		}
 
 		@Override
@@ -186,4 +203,39 @@ public class BridgeController {
 		public void onParsingErrors(List<PHHueParsingError> parsingErrorsList) {
 		}
 	};
+
+	private PHLightListener getLightListener() {
+		return new PHLightListener() {
+			boolean found = false;
+
+			@Override
+			public void onSuccess() {
+			}
+
+			@Override
+			public void onStateUpdate(Map<String, String> arg0, List<PHHueError> arg1) {
+			}
+
+			@Override
+			public void onError(int arg0, String arg1) {
+			}
+
+			@Override
+			public void onReceivingLightDetails(PHLight arg0) {
+				System.out.println("details");
+			}
+
+			@Override
+			public void onReceivingLights(List<PHBridgeResource> arg0) {
+				if (found)
+					return;
+				found = true;
+				JOptionPane.showMessageDialog(smartBulb, "Light added", "Info", JOptionPane.INFORMATION_MESSAGE);
+			}
+
+			@Override
+			public void onSearchComplete() {
+			}
+		};
+	}
 }

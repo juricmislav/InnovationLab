@@ -11,6 +11,13 @@ import javax.swing.Timer;
 
 import de.htwg.innovationlab.gui.SmartBulb;
 
+/**
+ * Innovation Lab Project 2017/2018
+ * HTWG Konstanz, University of Applied Sciences
+ *
+ * @author Mislav Jurić
+ * @version 1.0
+ */
 public class ProgressFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -42,7 +49,7 @@ public class ProgressFrame extends JFrame {
 			if (progressBar.getValue() >= 100) {
 				timer.stop();
 				setVisible(false);
-				if (executeLoadingProfile) {
+				if (progressBar.getValue() == 1 && executeLoadingProfile) {
 					executeLoadingProfile = false;
 					smartBulb.loadProfile();
 				}

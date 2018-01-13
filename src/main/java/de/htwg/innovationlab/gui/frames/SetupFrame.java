@@ -22,6 +22,13 @@ import com.philips.lighting.hue.sdk.PHAccessPoint;
 import de.htwg.innovationlab.bridge.BridgeListener;
 import de.htwg.innovationlab.gui.SmartBulb;
 
+/**
+ * Innovation Lab Project 2017/2018
+ * HTWG Konstanz, University of Applied Sciences
+ *
+ * @author Mislav Jurić
+ * @version 1.0
+ */
 public class SetupFrame extends JFrame implements BridgeListener {
 
 	private static final long serialVersionUID = 1L;
@@ -62,7 +69,7 @@ public class SetupFrame extends JFrame implements BridgeListener {
 
 		JPanel findBridgesPanel = new JPanel();
 		findBridgesPanel.add(findBridges);
-		findBridges.setPreferredSize(SmartBulb.preferredSize);
+		findBridges.setPreferredSize(SmartBulb.PREFERRED_SIZE);
 		add(findBridgesPanel, BorderLayout.NORTH);
 
 		JPanel lowerPanel = new JPanel();
@@ -75,10 +82,10 @@ public class SetupFrame extends JFrame implements BridgeListener {
 
 		JPanel connectPanel = new JPanel();
 		connectPanel.add(connectBridge);
-		connectBridge.setPreferredSize(SmartBulb.preferredSize);
+		connectBridge.setPreferredSize(SmartBulb.PREFERRED_SIZE);
 		lowerPanel.add(connectPanel);
 
-		cancel.setPreferredSize(SmartBulb.preferredSize);
+		cancel.setPreferredSize(SmartBulb.PREFERRED_SIZE);
 		JPanel cancelPanel = new JPanel();
 		cancelPanel.add(cancel);
 		lowerPanel.add(cancelPanel);
@@ -131,7 +138,7 @@ public class SetupFrame extends JFrame implements BridgeListener {
 		SetupFrame.this.accessPointsList = accessPointsList;
 		String[] data = new String[accessPointsList.size()];
 		for (int i = 0; i < accessPointsList.size(); i++) {
-			data[i] = accessPointsList.get(i).getIpAddress();
+			data[i] = accessPointsList.get(i).getIpAddress() + " | " + accessPointsList.get(i).getBridgeId();
 		}
 
 		this.accessPointsJList.setListData(data);
@@ -145,8 +152,8 @@ public class SetupFrame extends JFrame implements BridgeListener {
 			public void mouseClicked(MouseEvent e) {
 				int selectedIndex = accessPointsJList.getSelectedIndex();
 				if (selectedIndex > -1) {
-					connectBridge.setEnabled(true);
 					selectedAccessPoint = accessPointsList.get(selectedIndex);
+					connectBridge.setEnabled(true);
 					return;
 				}
 				connectBridge.setEnabled(false);

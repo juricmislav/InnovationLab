@@ -8,6 +8,13 @@ import javax.swing.UIManager;
 import de.htwg.innovationlab.gui.SmartBulb;
 import de.htwg.innovationlab.gui.room.Room;
 
+/**
+ * Innovation Lab Project 2017/2018
+ * HTWG Konstanz, University of Applied Sciences
+ *
+ * @author Mislav Jurić
+ * @version 1.0
+ */
 public class RemoveRoomAction extends RootAction {
 
 	private static final long serialVersionUID = 1L;

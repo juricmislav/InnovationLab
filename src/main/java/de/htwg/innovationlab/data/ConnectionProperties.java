@@ -10,10 +10,18 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+/**
+ * Innovation Lab Project 2017/2018
+ * HTWG Konstanz, University of Applied Sciences
+ *
+ * @author Mislav Jurić
+ * @version 1.0
+ */
 public class ConnectionProperties {
 
 	private String ipAddress;
 	private String userName;
+	private String macAddress;
 	private final Path path = Paths.get("Connection.properties");
 
 	public ConnectionProperties() {
@@ -44,6 +52,11 @@ public class ConnectionProperties {
 					if (pairs.length != 2) return;
 					userName = pairs[1];
 				}
+				if (line.startsWith("mac_address") && line.contains("=")) {
+					String[] pairs = line.split("=");
+					if (pairs.length != 2) return;
+					macAddress = pairs[1];
+				}
 			}
 		} catch (IOException e) {
 			System.err.println("Could not read from property file: " + e);
@@ -66,6 +79,14 @@ public class ConnectionProperties {
 		this.userName = userName;
 	}
 
+	public String getMacAddress() {
+		return macAddress;
+	}
+	
+	public void setMacAddress(String macAddress) {
+		this.macAddress = macAddress;
+	}
+	
 	public void saveProperties() {
 		
 		try (PrintWriter writer = new PrintWriter(
@@ -78,6 +99,11 @@ public class ConnectionProperties {
 			sb = new StringBuilder();
 			sb.append("user_name=");
 			sb.append(userName);
+			writer.println(sb.toString());
+			
+			sb = new StringBuilder();
+			sb.append("mac_address=");
+			sb.append(macAddress);
 			writer.print(sb.toString());
 
 		} catch (IOException e) {
